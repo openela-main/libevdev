@@ -1,0 +1,72 @@
+From 1e6fbc0bd54a15849b89e3fb66825e6e504d041c Mon Sep 17 00:00:00 2001
+From: Peter Hutterer <peter.hutterer@who-t.net>
+Date: Fri, 15 Nov 2019 15:22:38 +1000
+Subject: [PATCH libevdev] configure.ac: drop the custom linker and compiler
+ flags
+
+Let these be defined by the build environment. No-one has ever done any true
+analysis of these options for the libevdev context and whether they're
+beneficial. Let's assume the distributions know what they want to set.
+
+We leave in the visibility setting and the various warning options, both of
+those are useful/needed.
+
+Signed-off-by: Peter Hutterer <peter.hutterer@who-t.net>
+---
+ configure.ac         | 19 +------------------
+ libevdev/Makefile.am |  2 +-
+ 2 files changed, 2 insertions(+), 19 deletions(-)
+
+diff --git a/configure.ac b/configure.ac
+index 396dab9..711f7d4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -51,16 +51,6 @@ LT_PREREQ([2.2])
+ LT_INIT
+ LT_PATH_LD
+ 
+-with_ldflags=""
+-if test "x$lt_cv_prog_gnu_ld" = "xyes"; then
+-	CC_CHECK_FLAGS_APPEND([with_ldflags], [LDFLAGS], [\
+-				-Wl,--as-needed \
+-				-Wl,--gc-sections \
+-				-Wl,-z,relro \
+-				-Wl,-z,now])
+-fi
+-AC_SUBST([GNU_LD_FLAGS], $with_ldflags)
+-
+ case "${host_os}" in
+     freebsd*)
+ AC_SUBST([OS], [freebsd])
+@@ -91,14 +81,7 @@ if test "x$GCC" = "xyes"; then
+ 				-Wno-unused-parameter \
+ 				-Wstrict-prototypes \
+ 				-Wmissing-prototypes \
+-				-fvisibility=hidden \
+-				-pipe \
+-				-fno-strict-aliasing \
+-				-ffunction-sections \
+-				-fdata-sections \
+-				-fno-strict-aliasing \
+-				-fdiagnostics-show-option \
+-				-fno-common])
++				-fvisibility=hidden ])
+ fi
+ AC_SUBST([GCC_CFLAGS], $with_cflags)
+ 
+diff --git a/libevdev/Makefile.am b/libevdev/Makefile.am
+index 106cc31..80123fd 100644
+--- a/libevdev/Makefile.am
++++ b/libevdev/Makefile.am
+@@ -22,7 +22,7 @@ libevdev_la_LDFLAGS = \
+         $(AM_LDFLAGS) \
+ 	-version-info $(LIBEVDEV_LT_VERSION) \
+ 	-Wl,--version-script="$(srcdir)/libevdev.sym" \
+-	$(GNU_LD_FLAGS)
++	$(NULL)
+ 
+ EXTRA_libevdev_la_DEPENDENCIES = $(srcdir)/libevdev.sym
+ 
+-- 
+2.31.1
+
